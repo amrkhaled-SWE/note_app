@@ -14,6 +14,13 @@ class _NotesScreenState extends State<NotesScreen> {
   static const Color titleColor = Colors.black;
 
   final NotesController _controller = NotesController();
+  
+  @override
+  void initState() {
+    super.initState();
+
+    _controller.loadNotes();
+  }
 
   @override
   void dispose() {

@@ -1,8 +1,20 @@
 import 'package:flutter/foundation.dart';
+import 'package:notes/Network/network_helper.dart';
 import 'package:notes/note_model.dart';
 
 class NotesController extends ChangeNotifier {
   final List<NoteModel> _notes = [];
+  Future<void> loadNotes() async {
+    await HiveHelper.getNotes();
+
+    _notes.clear();
+
+    for (final note in HiveHelper.myNotes) {
+      _notes.add(NoteModel(content: note));
+    }
+
+    notifyListeners();
+  }
 
   List<NoteModel> get notes => List.unmodifiable(_notes);
 
@@ -13,25 +25,33 @@ class NotesController extends ChangeNotifier {
     return null;
   }
 
-  void addNote(String content) {
+  Future<void> addNote(String content) async {
     if (validateNote(content) != null) return;
-    _notes.add(NoteModel(content: content.trim()));
+    final note = content.trim();
+    _notes.add(NoteModel(content: note));
+
+    await HiveHelper.addNote(note);
+
     notifyListeners();
   }
 
-  void updateNote(int index, String content) {
+  void updateNote(int index, String content) async {
     if (validateNote(content) != null) return;
-    _notes[index] = _notes[index].copyWith(content: content.trim());
+    final note = content.trim();
+    await HiveHelper.updateNote(index, content);
+    _notes[index] = _notes[index].copyWith(content: note);
     notifyListeners();
   }
 
-  void deleteNote(int index) {
+  void deleteNote(int index) async {
     _notes.removeAt(index);
+    await HiveHelper.deleteNote(index);
     notifyListeners();
   }
 
-  void clearAll() {
+  void clearAll() async {
     _notes.clear();
+    await HiveHelper.deleteAllNotes();
     notifyListeners();
   }
 }

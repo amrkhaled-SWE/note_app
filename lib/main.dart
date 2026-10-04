@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:notes/Network/network_helper.dart';
 import 'package:notes/note_screen.dart';
-
-void main() {
+void main() async{
+  await Hive.initFlutter();
+  await Hive.openBox(HiveHelper.noteBox);
   runApp(const MyApp());
 }
 
